@@ -30,19 +30,26 @@ if node[:git_deploy]
       end
     end
 
-    git git_root do
-      repository site[:repo]
-      user "ubuntu"
-      group "ubuntu"
-      enable_submodules true
-      if site[:ssh_wrapper]
-        ssh_wrapper ssh_wrapper_file
+    current_revision = `cd #{git_root} && echo \`git rev-parse --short HEAD 2> /dev/null\``
+    
+    if current_revision == site[:revision] then
+      git git_root do
+        repository site[:repo]
+        user "ubuntu"
+        group "ubuntu"
+        enable_submodules true
+        if site[:ssh_wrapper]
+          ssh_wrapper ssh_wrapper_file
+        end
+        if site[:revision] then
+          revision site[:revision]
+        end
       end
-    end
 
-    if site[:command]
-      execute site[:command] do
-        cwd git_root
+      if site[:command]
+        execute site[:command] do
+          cwd git_root
+        end
       end
     end
   end
