@@ -7,7 +7,7 @@ if node['git_deploy']
     group "ubuntu"
   end
 
-  node[:git_deploy][:repos].each do |name, site|
+  node['git_deploy']['repos'].each do |name, site|
     git_root  = "#{repo_dir}/#{name}/"
 
     if site['repo'] then
@@ -30,9 +30,9 @@ if node['git_deploy']
         end
       end
 
-      current_revision = `cd #{git_root} && echo \`git rev-parse --short HEAD 2> /dev/null\``
+      current_revision = `cd #{git_root} && echo \`git rev-parse HEAD 2> /dev/null\``
       
-      if current_revision != site['revision'] then
+      if current_revision.strip! != site['revision'] then
         git git_root do
           repository site['repo']
           user "ubuntu"
@@ -46,9 +46,11 @@ if node['git_deploy']
           end
         end
         
-        if site['command']
-          execute site['command'] do
-            cwd git_root
+        if site['commands']
+          site['commands'].each do |command|
+            execute command do
+              cwd git_root
+            end
           end
         end
       end
