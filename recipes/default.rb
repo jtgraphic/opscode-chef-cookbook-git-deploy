@@ -30,9 +30,16 @@ if node['git_deploy']
         end
       end
 
-      current_revision = `cd #{git_root} && echo \`git rev-parse HEAD 2> /dev/null\``
+      version_file = "#{repo_dir}/#{name}_version"
+      current_version = File.exists?(version_file) ? File.open(version_file, "rb").read : '0.0.0'
       
-      if current_revision.strip! != site['revision'] then
+      if current_version != site['revision'] then
+        file version_file do
+          owner "ubuntu"
+          group "ubuntu"
+          content site['revision']
+        end
+
         git git_root do
           repository site['repo']
           user "ubuntu"
