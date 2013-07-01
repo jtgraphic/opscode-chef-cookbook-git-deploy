@@ -33,7 +33,7 @@ if node['git_deploy']
       version_file = "#{repo_dir}/#{name}_version"
       current_version = File.exists?(version_file) ? File.open(version_file, "rb").read : '0.0.0'
       
-      if current_version != site['revision'] then
+      if current_version != site['revision'] || site['continuous'] then
         file version_file do
           owner "ubuntu"
           group "ubuntu"
