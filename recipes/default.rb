@@ -33,13 +33,9 @@ if node['git_deploy']
       version_file = "#{repo_dir}/#{name}_version"
       current_version = File.exists?(version_file) ? File.open(version_file, "rb").read : '0.0.0'
       
+      log "revision: #{site['revision']}"
+      
       if current_version != site['revision'] || site['continuous'] then
-        file version_file do
-          owner "ubuntu"
-          group "ubuntu"
-          content site['revision']
-        end
-
         git git_root do
           repository site['repo']
           user "ubuntu"
@@ -52,7 +48,7 @@ if node['git_deploy']
             revision site['revision']
           end
         end
-        
+
         if site['commands']
           site['commands'].each do |command|
             execute command do
@@ -60,6 +56,13 @@ if node['git_deploy']
             end
           end
         end
+
+        file version_file do
+          owner "ubuntu"
+          group "ubuntu"
+          content site['revision']
+        end
+
       end
     end
   end
